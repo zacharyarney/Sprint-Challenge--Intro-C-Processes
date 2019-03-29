@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <dirent.h>
 
 /**
@@ -6,13 +7,26 @@
  */
 int main(int argc, char **argv)
 {
-  // Parse command line
+    char *path = argv[1];
+    // Parse command line
 
-  // Open directory
+    // Open directory
+    DIR *dir;
+    dir = opendir(path);
 
-  // Repeatly read and print entries
+    if (dir == NULL) {
+        printf("Couldn't open directory");
+        exit(1);
+    }
 
-  // Close directory
+    // Repeatly read and print entries
+    struct dirent *entries;
+    while((entries = readdir(dir)) != NULL) {
+        printf("%s\n", entries->d_name);    
+    }
+
+    // Close directory
+    closedir(dir);
 
   return 0;
 }
