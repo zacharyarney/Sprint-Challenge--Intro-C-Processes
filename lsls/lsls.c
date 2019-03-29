@@ -2,21 +2,28 @@
 #include <stdlib.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <string.h>
 
 /**
  * Main
  */
 int main(int argc, char **argv)
 {
-    char *path = argv[1];
+    char *path;
     // Parse command line
 
     // Open directory
+    if (argc == 1) {
+        path = "./";
+    } else {
+        path = argv[1];
+    }
+
     DIR *dir;
     dir = opendir(path);
 
     if (dir == NULL) {
-        printf("Couldn't open directory");
+        printf("Couldn't open directory\n");
         exit(1);
     }
 
@@ -24,7 +31,13 @@ int main(int argc, char **argv)
     struct dirent *entries;
     struct stat buf;
     while((entries = readdir(dir)) != NULL) {
-        stat(entries->d_name, &buf);
+        // these two lines and using pathcpy in stat fix the problem 
+        // outlined below
+        // there is more unexpected behavior when the path does not end in '/'
+        // the sizes will all display the same huge number 140732*********
+        char * pathcpy = strdup(path);
+        strcat(pathcpy, entries->d_name);
+        stat(pathcpy, &buf);
         // just following what's outlined in the README
         // but the behavior is a bit unexpected
         // many files will have the exact same size
