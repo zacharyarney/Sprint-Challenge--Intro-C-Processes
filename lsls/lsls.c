@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
+#include <sys/stat.h>
 
 /**
  * Main
@@ -21,8 +22,15 @@ int main(int argc, char **argv)
 
     // Repeatly read and print entries
     struct dirent *entries;
+    struct stat buf;
     while((entries = readdir(dir)) != NULL) {
-        printf("%s\n", entries->d_name);    
+        stat(entries->d_name, &buf);
+        // just following what's outlined in the README
+        // but the behavior is a bit unexpected
+        // many files will have the exact same size
+        // (often 256, which is wrong)
+        // not sure why
+        printf("%10lld %s\n", buf.st_size, entries->d_name);    
     }
 
     // Close directory
